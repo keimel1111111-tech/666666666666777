@@ -1,0 +1,28 @@
+:root{
+  --bg:#0f1724;
+  --muted:#94a3b8;
+  --accent:#06b6d4;
+  --card:#0b1220;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#0b1220,#071029);color:#e6eef6}
+.container{max-width:1000px;margin:0 auto;padding:24px}
+.site-header{padding:12px 0;background:transparent}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{height:40px}
+.nav{display:flex;gap:8px}
+.nav-btn{background:transparent;border:1px solid transparent;color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer}
+.nav-btn.active{color:#fff;border-color:rgba(255,255,255,0.06);background:rgba(255,255,255,0.02)}
+.main-content{padding:48px 24px}
+.hero-title{font-size:36px;margin:0 0 8px}
+.hero-sub{color:var(--muted);margin:0 0 16px}
+.primary{background:var(--accent);border:none;color:#06202a;padding:10px 14px;border-radius:8px;cursor:pointer}
+.cards{display:flex;gap:12px;margin-top:12px}
+.card{background:var(--card);padding:16px;border-radius:8px;flex:1}
+.section{padding:24px 0}
+.hidden{display:none}
+.client-form{display:flex;gap:8px;align-items:center}
+.client-form input{padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#e6eef6}
+.client-list{list-style:none;padding:0;margin-top:12px}
+.client-list li{background:rgba(255,255,255,0.03);padding:8px;border-radius:6px;margin-bottom:8px;display:flex;justify-content:space-between}
+.site-footer{border-top:1px solid rgba(255,255,255,0.03);padding:16px 0;margin-top:24px}
