@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gestión de Clientes de Streaming</title>
+
+<!-- Fuentes & Iconos -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+<style>
+/* =========================
+   Variables & Reset
+========================= */
+:root{
+  --bg:#0b1020;
+  --bg-2:#0e1428;
+  --text:#e8eefc;
+  --muted:#9aa6c1;
+  --primary:#6aa6ff;
+  --primary-2:#4a90e2;
+  --accent:#7cf7e6;
+  --card: rgba(255,255,255,.06);
+  --stroke: rgba(255,255,255,.1);
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,"Helvetica Neue",Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 800px at 110% -10%, #1c2450 0%, #0b1020 60%, #0b1020 100%),
+    linear-gradient(180deg, #0b1020 0%, #0b1020 100%);
+  display:flex;
+  flex-direction:column;
+}
+
+/* =========================
+   Header / Nav
+========================= */
+header{
+  position:sticky; top:0; z-index:1000;
+  backdrop-filter:saturate(140%) blur(10px);
+  background:linear-gradient(180deg, rgba(15,20,40,.75), rgba(15,20,40,.35));
+  border-bottom:1px solid var(--stroke);
+  padding:.6rem 1rem;
+  display:flex; align-items:center; justify-content:space-between; gap:1rem;
+}
+
+.brand{display:flex; align-items:center; gap:.6rem; white-space:nowrap}
+.brand i{font-size:1.1rem; color:var(--accent)}
+.brand a{color:var(--text); text-decoration:none; font-weight:800; letter-spacing:.3px}
+
+.nav{
+  display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--stroke);
+  border-radius:999px; padding:.25rem;
+}
+.nav a{
+  color:var(--text); text-decoration:none; font-weight:600;
+  padding:.45rem .9rem; border-radius:999px; font-size:.92rem;
+  transition:transform .2s ease, background .2s ease;
+}
+.nav a:hover{transform:translateY(-1px); background:rgba(255,255,255,.06)}
+.nav a.active{background:linear-gradient(90deg, var(--primary), var(--accent)); color:#0b1020; box-shadow:0 8px 20px rgba(106,166,255,.35)}
+
+.user{
+  display:flex; align-items:center; gap:.5rem;
+}
+.user-icon{
+  width:40px; height:40px; border-radius:50%; cursor:pointer;
+  border:1px solid var(--stroke);
+  background:linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,.05));
+  transition:transform .25s ease;
+}
+.user-icon:hover{transform:scale(1.05)}
+
+.logout-menu{
+  display:none; position:absolute; top:64px; right:10px; z-index:9999;
+  background:#0e1428; border:1px solid var(--stroke); border-radius:10px; box-shadow:var(--shadow);
+  overflow:hidden; min-width:190px;
+}
+.logout-menu a{
+  display:block; padding:.8rem 1rem; color:var(--text); text-decoration:none; font-weight:600;
+  border-bottom:1px solid var(--stroke);
+}
+.logout-menu a:last-child{border-bottom:none}
+.logout-menu a:hover{background:rgba(255,255,255,.06)}
+
+/* =========================
+   Hero (Inicio)
+========================= */
+section.hero{
+  position:relative;
+  padding: clamp(60px, 8vw, 120px) 20px;
+  display:grid; place-items:center; text-align:center; overflow:hidden;
+}
+.hero h1{
+  font-size: clamp(28px, 6vw, 56px);
+  line-height:1.05; margin:0 0 .6rem 0; letter-spacing:.3px;
+}
+.hero p{
+  max-width:800px; margin:.2rem auto 1.2rem; color:var(--muted); font-size: clamp(14px, 2.5vw, 18px);
+}
+.cta{
+  display:flex; gap:.7rem; flex-wrap:wrap; justify-content:center; margin-top:10px;
+}
+.btn{
+  padding:.9rem 1.1rem; border-radius:12px; border:1px solid var(--stroke);
+  background:rgba(255,255,255,.06); color:var(--text); font-weight:700; cursor:pointer;
+  letter-spacing:.2px; transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.btn:hover{transform:translateY(-2px); background:rgba(255,255,255,.09)}
+.btn-primary{
+  background:linear-gradient(90deg, var(--primary), var(--accent));
+  color:#0b1020; border-color:transparent;
+  box-shadow:0 12px 26px rgba(122,246,230,.25);
+}
+.btn-primary:hover{box-shadow:0 16px 30px rgba(122,246,230,.35)}
+.hero-ornaments .orb{
+  position:absolute; filter:blur(20px); opacity:.28; mix-blend:screen; pointer-events:none;
+  border-radius:50%;
+}
+.orb.o1{width:420px; height:420px; background:radial-gradient(circle, var(--accent), transparent 60%); top:-80px; left:-80px;}
+.orb.o2{width:480px; height:480px; background:radial-gradient(circle, var(--primary), transparent 60%); bottom:-140px; right:-120px;}
+.orb.o3{width:300px; height:300px; background:radial-gradient(circle, #b47cff, transparent 60%); top:20%; right:20%;}
+
+/* =========================
+   Servicios (showcase visual)
+========================= */
+section#servicios{
+  padding:60px 20px; max-width:1200px; margin:0 auto;
+}
+.grid{
+  display:grid; grid-template-columns:repeat(12,1fr); gap:16px;
+}
+.card{
+  grid-column: span 4;
+  background:var(--card); border:1px solid var(--stroke); border-radius:16px;
+  padding:18px; box-shadow:var(--shadow); transition:transform .25s ease, border-color .25s ease;
+}
+.card:hover{transform:translateY(-3px); border-color:rgba(255,255,255,.22)}
+.card h3{margin:.2rem 0 .4rem 0}
+.card p{margin:0; color:var(--muted)}
+.card .icon{
+  width:46px; height:46px; display:grid; place-items:center; border-radius:12px;
+  background:linear-gradient(135deg, rgba(106,166,255,.25), rgba(124,247,230,.25));
+  border:1px solid var(--stroke); margin-bottom:.6rem; font-size:1.2rem;
+}
+@media (max-width: 1024px){ .card{grid-column: span 6;} }
+@media (max-width: 640px){ .card{grid-column: span 12;} }
+
+/* =========================
+   App (tu lógica intacta)
+========================= */
+section#app{ flex:1; max-width:1200px; margin:24px auto; padding:20px; }
+.container{
+  background:var(--card); border:1px solid var(--stroke); border-radius:16px;
+  box-shadow:var(--shadow); color:var(--text);
+}
+
+.form-and-clients{
+  display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap;
+}
+.form-section, .client-list{
+  flex:1; min-width: 280px;
+  background:rgba(255,255,255,.04);
+  padding:20px; border-radius:12px; border:1px solid var(--stroke);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+.form-section h2, .client-list h2{
+  font-size:1.05rem; margin:0 0 12px 0; letter-spacing:.2px;
+}
+
+label{display:block; margin:.45rem 0 .25rem; font-weight:700}
+input[type="text"], input[type="date"], input[type="number"], input[type="email"], select, input[type="password"]{
+  width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--stroke);
+  background:rgba(255,255,255,.06); color:var(--text); font-size:.95rem; outline:none;
+}
+input::placeholder{color:#c2cbe2aa}
+select{appearance:none}
+
+.password-toggle{
+  position:relative; float:right; margin-top:-33px; margin-right:8px; cursor:pointer; color:var(--muted);
+}
+
+button{
+  padding:10px 14px; border:none; border-radius:10px; cursor:pointer; font-weight:800; font-size:.9rem;
+  transition:transform .2s ease, filter .2s ease; letter-spacing:.2px;
+}
+button:hover{transform:translateY(-1px)}
+.btn-primary{ background:linear-gradient(90deg, var(--primary), var(--accent)); color:#0b1020; }
+.btn-success{ background:#22c55e; color:#07120a;}
+.btn-warning{ background:#f59e0b; color:#110b07;}
+.btn-danger{ background:#ef4444; color:#160707;}
+
+.client-table{
+  width:100%; border-collapse:collapse; margin-top:16px; font-size:.92rem; overflow:hidden; border-radius:10px;
+}
+.client-table th, .client-table td{
+  border:1px solid var(--stroke); padding:10px; text-align:left; background:rgba(255,255,255,.02);
+}
+.client-table th{
+  background:linear-gradient(180deg, rgba(74,144,226,.6), rgba(74,144,226,.3));
+  color:#061225;
+}
+.table-wrap{overflow:auto}
+
+.status-paid{color:#22c55e; font-weight:800}
+.status-pending{color:#ef4444; font-weight:800}
+.actions{display:flex; gap:6px; justify-content:flex-start; flex-wrap:wrap}
+.actions button{flex: none; font-size:.82rem}
+
+#month-buttons{
+  display:flex; justify-content:center; align-items:center; gap:6px; flex-wrap:wrap;
+  margin-bottom:16px;
+}
+#month-buttons button{
+  padding:9px 12px; background:rgba(255,255,255,.06); color:var(--text);
+  border:1px solid var(--stroke); border-radius:10px; cursor:pointer; font-weight:700;
+}
+#month-buttons button.selected{ background:linear-gradient(90deg, var(--primary), var(--accent)); color:#0b1020; }
+#month-buttons button:hover{ filter:brightness(1.1) }
+
+.service-item{
+  display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,.06);
+  padding:6px 10px; border-radius:8px; margin-bottom:6px; border:1px solid var(--stroke);
+}
+.service-item button{ background:#ef4444; color:#fff; border:none; border-radius:6px; padding:2px 8px; font-size:.78rem; }
+
+/* =========================
+   Ayuda
+========================= */
+section#ayuda{
+  padding:40px 20px; max-width:1000px; margin:0 auto 40px;
+}
+.help-card{
+  background:var(--card); border:1px solid var(--stroke); border-radius:16px; padding:18px; box-shadow:var(--shadow)
+}
+.help-card h3{margin:.2rem 0 .6rem}
+.help-card ul{margin:.2rem 0 0 1.2rem}
+.help-card li{margin:.25rem 0; color:var(--muted)}
+
+/* =========================
+   Footer
+========================= */
+footer{
+  margin-top:auto; padding:26px 16px; border-top:1px solid var(--stroke);
+  background:linear-gradient(180deg, rgba(15,20,40,.35), rgba(10,14,28,.35));
+  color:var(--muted); text-align:center; font-size:.9rem;
+}
+footer .links{display:flex; gap:12px; justify-content:center; margin:.5rem 0}
+footer .links a{color:var(--text); text-decoration:none; opacity:.9}
+footer .links a:hover{opacity:1}
+
+/* Responsive tweaks */
+@media (max-width:780px){
+  .nav{justify-content:center}
+  header{flex-wrap:wrap; gap:.8rem}
+}
+</style>
+</head>
+<body>
+
+<!-- =======================
+     Header / Nav
+======================= -->
+<header>
+  <div class="brand">
+    <i class="fa-solid fa-bolt"></i>
+    <a href="#" data-nav="home" class="nav-brand">KeitelStream</a>
+  </div>
+
+  <nav class="nav">
+    <a href="#" data-nav="home" class="active"><i class="fa-solid fa-house"></i>&nbsp;Inicio</a>
+    <a href="#" data-nav="app"><i class="fa-solid fa-grid-2"></i>&nbsp;Aplicación</a>
+    <a href="#" data-nav="servicios"><i class="fa-solid fa-layer-group"></i>&nbsp;Servicios</a>
+    <a href="#" data-nav="ayuda"><i class="fa-solid fa-circle-question"></i>&nbsp;Ayuda</a>
+  </nav>
+
+  <div class="user">
+    <!-- Puedes reemplazar user_icon.png por tu imagen -->
+    <img src="user_icon.png" alt="Usuario" class="user-icon" id="user-icon">
+  </div>
+
+  <div class="logout-menu" id="logout-menu">
+    <a href="#" id="logout-link">Cerrar Sesión</a>
+  </div>
+</header>
+
+<!-- =======================
+     Hero / Inicio
+======================= -->
+<section class="hero" id="home">
+  <div class="hero-ornaments">
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="orb o3"></div>
+  </div>
+
+  <h1>Gestión de Clientes de Streaming</h1>
+  <p>Administra clientes, fechas de pago, servicios y cobros desde un panel
+     minimalista con look futurista. Todo corre en tu navegador, con guardado
+     local y acciones rápidas por WhatsApp.</p>
+
+  <div class="cta">
+    <button class="btn btn-primary" data-nav="app"><i class="fa-solid fa-rocket"></i>&nbsp;Ir a la aplicación</button>
+    <button class="btn" data-nav="servicios"><i class="fa-solid fa-grid-2"></i>&nbsp;Ver servicios</button>
+  </div>
+</section>
+
+<!-- =======================
+     Servicios (showcase)
+======================= -->
+<section id="servicios">
+  <div class="grid">
+    <div class="card">
+      <div class="icon"><i class="fa-brands fa-netflix"></i></div>
+      <h3>Netflix</h3>
+      <p>Perfil, plan compartido, recordatorios de pago y control por cliente.</p>
+    </div>
+    <div class="card">
+      <div class="icon"><i class="fa-brands fa-discord"></i></div>
+      <h3>Disney+</h3>
+      <p>Gestión de slots, fecha de renovación y enlace rápido a cobro.</p>
+    </div>
+    <div class="card">
+      <div class="icon"><i class="fa-solid fa-tv"></i></div>
+      <h3>Hulu</h3>
+      <p>Administra usuarios, correo y estado del pago en un clic.</p>
+    </div>
+    <div class="card">
+      <div class="icon"><i class="fa-brands fa-amazon"></i></div>
+      <h3>Prime Video</h3>
+      <p>Suma o quita servicios y fija precios mensuales personalizados.</p>
+    </div>
+    <div class="card">
+      <div class="icon"><i class="fa-solid fa-clapperboard"></i></div>
+      <h3>HBO Max</h3>
+      <p>Lista clara, filtros por mes, y cambios en caliente.</p>
+    </div>
+    <div class="card">
+      <div class="icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <h3>Local & Seguro</h3>
+      <p>Toda la info se guarda en tu navegador (localStorage).</p>
+    </div>
+  </div>
+</section>
+
+<!-- =======================
+     Aplicación (tu app)
+======================= -->
+<section id="app">
+  <div class="container">
+    <div id="month-buttons">
+      <button onclick="filterByMonth('enero')">Enero</button>
+      <button onclick="filterByMonth('febrero')">Febrero</button>
+      <button onclick="filterByMonth('marzo')">Marzo</button>
+      <button onclick="filterByMonth('abril')">Abril</button>
+      <button onclick="filterByMonth('mayo')">Mayo</button>
+      <button onclick="filterByMonth('junio')">Junio</button>
+      <button onclick="filterByMonth('julio')">Julio</button>
+      <button onclick="filterByMonth('agosto')">Agosto</button>
+      <button onclick="filterByMonth('septiembre')">Septiembre</button>
+      <button onclick="filterByMonth('octubre')">Octubre</button>
+      <button onclick="filterByMonth('noviembre')">Noviembre</button>
+      <button onclick="filterByMonth('diciembre')">Diciembre</button>
+    </div>
+
+    <div class="form-and-clients">
+      <div class="form-section">
+        <h2>Agregar Cliente</h2>
+        <form id="client-form">
+          <label for="client-name">Nombre del Cliente</label>
+          <input type="text" id="client-name" required>
+
+          <label for="email">Correo Electrónico</label>
+          <input type="email" id="email" required>
+
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" required>
+          <i class="fa fa-eye password-toggle" id="toggle-password" title="Mostrar/Ocultar"></i>
+
+          <label for="payment-date">Fecha de Pago</label>
+          <input type="date" id="payment-date" required>
+
+          <label for="service">Servicio(s)</label>
+          <div id="service-list">
+            <select id="service" multiple required>
+              <option value="Netflix">Netflix</option>
+              <option value="Disney+">Disney+</option>
+              <option value="Hulu">Hulu</option>
+              <option value="Amazon Prime">Amazon Prime</option>
+              <option value="HBO Max">HBO Max</option>
+            </select>
+          </div>
+
+          <div id="new-service-form">
+            <label for="new-service">Agregar Nuevo Servicio</label>
+            <input type="text" id="new-service" placeholder="Star+, Crunchyroll, etc.">
+            <button type="button" id="add-service" class="btn-primary">Agregar Servicio</button>
+          </div>
+
+          <label for="monthly-price">Precio Mensual</label>
+          <input type="number" id="monthly-price" required>
+
+          <button type="submit" class="btn-primary">Agregar Cliente</button>
+        </form>
+      </div>
+
+      <div class="client-list">
+        <h2>Lista de Clientes</h2>
+        <div class="table-wrap">
+          <table class="client-table" id="client-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo Electrónico</th>
+                <th>Fecha de Pago</th>
+                <th>Servicios</th>
+                <th>Precio Mensual</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="client-tbody">
+              <!-- Filas dinámicas -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =======================
+     Ayuda
+======================= -->
+<section id="ayuda">
+  <div class="help-card">
+    <h3><i class="fa-solid fa-lightbulb"></i> Tips rápidos</h3>
+    <ul>
+      <li>Guarda automático: todo se persiste en tu navegador (localStorage).</li>
+      <li>Marca <b>Pagado</b> y se generará la próxima fecha automáticamente.</li>
+      <li>Filtra por mes con los botones superiores.</li>
+      <li>Agrega nuevos servicios con el campo “Agregar Nuevo Servicio”.</li>
+      <li>“Enviar WhatsApp” construye el mensaje con los datos del cliente.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div>© <script>document.write(new Date().getFullYear())</script> KeitelStream. Minimal • Futurista • Rápido</div>
+  <div class="links">
+    <a href="#" data-nav="home">Inicio</a> ·
+    <a href="#" data-nav="app">Aplicación</a> ·
+    <a href="#" data-nav="servicios">Servicios</a> ·
+    <a href="#" data-nav="ayuda">Ayuda</a>
+  </div>
+</footer>
+
+<!-- =======================
+     Script (lógica original + navegación ligera)
+======================= -->
+<script>
+/* ======= LÓGICA ORIGINAL (NO ALTERADA) ======= */
+document.getElementById('client-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name = document.getElementById('client-name').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const paymentDate = document.getElementById('payment-date').value;
+  const services = Array.from(document.getElementById('service').selectedOptions).map(option => option.value);
+  const monthlyPrice = document.getElementById('monthly-price').value;
+
+  const client = { name, email, password, paymentDate, services, monthlyPrice, status: 'Pendiente' };
+  addClient(client);
+  this.reset();
+});
+
+function addClient(client) {
+  const tbody = document.getElementById('client-tbody');
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>${client.name}</td>
+    <td>${client.email}</td>
+    <td>${client.paymentDate}</td>
+    <td>${client.services.join(', ')}</td>
+    <td>${client.monthlyPrice}</td>
+    <td class="${client.status === 'Pagado' ? 'status-paid' : 'status-pending'}">${client.status}</td>
+    <td class="actions">
+      <button class="btn-success" onclick="markAsPaid(this)">Pagado</button>
+      <button class="btn-warning" onclick="editClient(this)">Editar</button>
+      <button class="btn-danger" onclick="deleteClient(this)">Eliminar</button>
+      <button class="btn-success" onclick="sendInvoice('${client.name}', '${client.services.join(', ')}', '${client.monthlyPrice}')">Enviar WhatsApp</button>
+    </td>
+  `;
+  tbody.appendChild(row);
+  saveClientsToLocalStorage();
+}
+
+function markAsPaid(button) {
+  const row = button.parentElement.parentElement;
+  const statusCell = row.children[5];
+  statusCell.textContent = 'Pagado';
+  statusCell.className = 'status-paid';
+
+  const paymentDateCell = row.children[2];
+  const currentDate = new Date(paymentDateCell.textContent);
+  currentDate.setMonth(currentDate.getMonth() + 1);
+  const nextMonthDate = currentDate.toISOString().split('T')[0];
+
+  const client = {
+    name: row.children[0].textContent,
+    email: row.children[1].textContent,
+    password: '',
+    paymentDate: nextMonthDate,
+    services: row.children[3].textContent.split(', '),
+    monthlyPrice: row.children[4].textContent,
+    status: 'Pendiente'
+  };
+  addClient(client);
+  saveClientsToLocalStorage();
+}
+
+function editClient(button) {
+  const row = button.parentElement.parentElement;
+  const name = row.children[0].textContent;
+  const email = row.children[1].textContent;
+  const paymentDate = row.children[2].textContent;
+  const services = row.children[3].textContent.split(', ');
+  const monthlyPrice = row.children[4].textContent;
+
+  document.getElementById('client-name').value = name;
+  document.getElementById('email').value = email;
+  document.getElementById('payment-date').value = paymentDate;
+  document.getElementById('monthly-price').value = monthlyPrice;
+
+  const serviceSelect = document.getElementById('service');
+  Array.from(serviceSelect.options).forEach(option => {
+    option.selected = services.includes(option.value);
+  });
+
+  deleteClient(button);
+}
+
+function deleteClient(button) {
+  const row = button.parentElement.parentElement;
+  row.remove();
+  saveClientsToLocalStorage();
+}
+
+document.getElementById('user-icon').addEventListener('click', function() {
+  document.getElementById('logout-menu').style.display = 'block';
+});
+document.getElementById('logout-link').addEventListener('click', function(e) {
+  e.preventDefault();
+  // Lógica de cierre de sesión (placeholder)
+});
+document.addEventListener('click', (e)=>{
+  const menu = document.getElementById('logout-menu');
+  const icon = document.getElementById('user-icon');
+  if(!menu.contains(e.target) && e.target !== icon){ menu.style.display = 'none'; }
+});
+
+document.getElementById('toggle-password').addEventListener('click', function() {
+  const passwordInput = document.getElementById('password');
+  passwordInput.type = (passwordInput.type === 'password') ? 'text' : 'password';
+});
+
+/* Filtrar por mes (original) */
+function filterByMonth(month) {
+  const tbody = document.getElementById('client-tbody');
+  Array.from(tbody.children).forEach(row => {
+    const paymentDate = new Date(row.children[2].textContent);
+    const paymentMonth = paymentDate.toLocaleString('es-ES', { month: 'long' });
+    row.style.display = (paymentMonth.toLowerCase() === month) ? '' : 'none';
+  });
+  const buttons = document.querySelectorAll('#month-buttons button');
+  buttons.forEach(button => {
+    button.classList.remove('selected');
+    if (button.textContent.toLowerCase() === month) button.classList.add('selected');
+  });
+}
+
+/* localStorage (original) */
+function saveClientsToLocalStorage() {
+  const tbody = document.getElementById('client-tbody');
+  const clients = Array.from(tbody.children).map(row => ({
+    name: row.children[0].textContent,
+    email: row.children[1].textContent,
+    paymentDate: row.children[2].textContent,
+    services: row.children[3].textContent.split(', '),
+    monthlyPrice: row.children[4].textContent,
+    status: row.children[5].textContent
+  }));
+  localStorage.setItem('clients', JSON.stringify(clients));
+}
+function loadClientsFromLocalStorage() {
+  const clients = JSON.parse(localStorage.getItem('clients')) || [];
+  clients.forEach(addClient);
+}
+
+/* Cargar clientes + marcar mes actual (original) */
+window.addEventListener('load', loadClientsFromLocalStorage);
+window.addEventListener('load', function() {
+  const currentMonth = new Date().toLocaleString('es-ES', { month: 'long' }).toLowerCase();
+  const buttons = document.querySelectorAll('#month-buttons button');
+  buttons.forEach(button => {
+    if (button.textContent.toLowerCase() === currentMonth) {
+      button.classList.add('selected');
+    }
+  });
+});
+
+document.getElementById('add-service').addEventListener('click', function() {
+  const newService = document.getElementById('new-service').value.trim();
+  if (newService) {
+    const serviceSelect = document.getElementById('service');
+    const option = document.createElement('option');
+    option.value = newService;
+    option.textContent = newService;
+    serviceSelect.appendChild(option);
+    document.getElementById('new-service').value = '';
+  }
+});
+
+/* WhatsApp (original) */
+function sendInvoice(name, services, price) {
+  const message = `Hola señor(a) ${name},\n\nSe ha generado su pago de los siguientes productos seleccionados: ${services} con un precio mensual de ${price}.\n\nPor favor, realice su pago lo más pronto posible.\n\nCuentas bancarias para depositar:\nBanco Reserva: 9601301707\nBanco Popular: 829082106`;
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappURL = `https://wa.me/?text=${encodedMessage}`;
+  window.open(whatsappURL, '_blank');
+}
+
+/* ======= Navegación ligera (NO interfiere con tu lógica) ======= */
+const sections = {
+  home: document.getElementById('home'),
+  servicios: document.getElementById('servicios'),
+  app: document.getElementById('app'),
+  ayuda: document.getElementById('ayuda')
+};
+
+function showSection(key){
+  Object.entries(sections).forEach(([k,el])=>{
+    if(!el) return;
+    el.style.display = (k===key) ? '' : 'none';
+  });
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
+  const active = document.querySelector(`.nav a[data-nav="${key}"]`);
+  if(active) active.classList.add('active');
+  // scroll suave al top
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.querySelectorAll('[data-nav]').forEach(el=>{
+  el.addEventListener('click', (e)=>{
+    e.preventDefault();
+    const key = el.getAttribute('data-nav');
+    if(sections[key]) showSection(key);
+  });
+});
+
+// Estado inicial: mostrar Inicio
+window.addEventListener('load', ()=> showSection('home'));
+</script>
+</body>
+</html>
