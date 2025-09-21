@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Keitel - Versión estática</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="site-header">
+        <div class="container header-inner">
+          <img src="/keitel-trabajo-final-main/public/placeholder-logo.png" class="logo" alt="logo" />
+          <nav class="nav">
+            <button data-section="home" class="nav-btn active">Inicio</button>
+            <button data-section="servicios" class="nav-btn">Servicios</button>
+            <button data-section="app" class="nav-btn">App</button>
+            <button data-section="ayuda" class="nav-btn">Ayuda</button>
+          </nav>
+        </div>
+      </header>
+
+      <main class="container main-content">
+        <section id="home" class="section">
+          <h1 class="hero-title">Bienvenido a Keitel</h1>
+          <p class="hero-sub">Gestión simple y profesional de clientes</p>
+          <button id="go-app" class="primary">Ir a la App</button>
+        </section>
+
+        <section id="servicios" class="section hidden">
+          <h2>Servicios</h2>
+          <div class="cards">
+            <div class="card">Facturación</div>
+            <div class="card">Reportes</div>
+            <div class="card">Soporte</div>
+          </div>
+        </section>
+
+        <section id="app" class="section hidden">
+          <h2>App - Clientes</h2>
+          <div class="manager">
+            <form id="client-form" class="client-form">
+              <input id="name" placeholder="Nombre" required />
+              <input id="email" placeholder="Email" required />
+              <button type="submit" class="primary">Agregar</button>
+            </form>
+            <ul id="client-list" class="client-list"></ul>
+          </div>
+        </section>
+
+        <section id="ayuda" class="section hidden">
+          <h2>Ayuda</h2>
+          <p>Si tienes problemas, escribe a tu profesor o revisa el README del repositorio.</p>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="container footer-inner">
+          <span>© Keitel - Entrega de trabajo</span>
+          <a href="#" id="contact">Contacto</a>
+        </div>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
